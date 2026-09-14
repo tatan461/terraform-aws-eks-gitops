@@ -1,14 +1,13 @@
-Markdown
 # AWS EKS Enterprise Platform with GitOps (ArgoCD & Terraform)
 
 A production-grade, highly available Amazon EKS cluster provisioned entirely via Terraform, featuring automated continuous deployment using ArgoCD for declarative GitOps workflows.
 
 Infrastructure fully provisioned as code (IaC) with modular Terraform components.
 
-![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=flat&logo=amazon-aws&logoColor=white)
-![Terraform](https://img.shields.io/badge/Terraform-%235835CC.svg?style=flat&logo=terraform&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=flat&logo=kubernetes&logoColor=white)
-![ArgoCD](https://img.shields.io/badge/argo%20cd-%23ef7b4d.svg?style=flat&logo=argo&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/argocd-%23EF705C.svg?style=for-the-badge&logo=argo&logoColor=white)
 
 ---
 
@@ -16,28 +15,29 @@ Infrastructure fully provisioned as code (IaC) with modular Terraform components
 
 ```mermaid
 flowchart TD
-    subgraph AWS Cloud ["AWS Cloud (VPC Multi-AZ)"]
-        ALB[Application Load Balancer] --> EKS[Amazon EKS Control Plane]
-        EKS --> Nodes[Managed Node Groups - EC2]
-        Nodes --> Argo[ArgoCD Controller]
-        Argo --> App[GitOps Applications]
+    subgraph AWS_Cloud ["AWS Cloud (VPC Multi-AZ)"]
+        ALB["Application Load Balancer"] --> EKS["Amazon EKS Control Plane"]
+        EKS --> Nodes["Managed Node Groups - EC2"]
+        Nodes --> Argo["ArgoCD Controller"]
+        Argo --> App["App [GitOps Applications]"]
     end
-    Git[GitHub Repository] -->|Syncs Manifests| Argo
-VPC & Networking: Custom multi-AZ Virtual Private Cloud with public and private subnets, ensuring secure network isolation and automated NAT routing.
+    Git["GitHub Repository"] -->|Syncs Manifests| Argo
+    
+    VPC & Networking: Custom multi-AZ Virtual Private Cloud with public and private subnets, ensuring secure network isolation.
 
 Compute (EKS): Scalable Amazon EKS cluster managed via Terraform with robust worker node groups.
 
-GitOps Continuous Delivery: ArgoCD continuously monitors this repository and automatically synchronizes the cluster state with the manifests defined in k8s/.
+GitOps Continuous Delivery: ArgoCD continuously monitors this repository and automatically synchronizes the cluster state.
 
 Project Structure
 Plaintext
 terraform-aws-eks-gitops/
 ├── terraform/
-│   ├── main.tf          # Provider configurations and required versions
-│   ├── variables.tf     # Input variables (cluster name, version, region)
-│   ├── vpc.tf           # Network architecture module
-│   ├── eks.tf           # EKS cluster and managed node group definitions
-│   └── outputs.tf       # Post-deployment outputs (endpoint, kubeconfig command)
+│   ├── main.tf       # Provider configurations and required versions
+│   ├── variables.tf  # Input variables (cluster name, version, region)
+│   ├── vpc.tf        # Network architecture module
+│   ├── eks.tf        # EKS cluster and managed node group definitions
+│   └── outputs.tf    # Post-deployment outputs (endpoint, kubeconfig command)
 └── k8s/
     └── argocd/
         └── application.yaml # Declarative ArgoCD application manifest
@@ -59,7 +59,7 @@ Install ArgoCD using server-side apply and register the application manifest:
 
 Bash
 kubectl create namespace argocd
-kubectl apply --server-side -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml](https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml)
+kubectl apply --server-side -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 kubectl apply -f ../k8s/argocd/application.yaml
 🧹 Cost Management (Cleanup)
 To avoid ongoing AWS charges, destroy the infrastructure when finished:
