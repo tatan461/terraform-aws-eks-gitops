@@ -55,9 +55,9 @@ The code layout separates core infrastructure modules from manifest targets:
 ## How to Deploy
 
 ### Prerequisites
-*Valid AWS CLI credentials configured within your active workspace terminal.
-*Terraform CLI executable binary installed locally (>= 1.5.0).
-*kubectl and Helm command-line utilities configured locally.
+* Valid AWS CLI credentials configured within your active workspace terminal.
+* Terraform CLI executable binary installed locally (>= 1.5.0).
+* kubectl and Helm command-line utilities configured locally.
 
 ### Deployment Steps
 **Change directory into the IaC configuration folder:**
