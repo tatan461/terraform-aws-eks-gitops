@@ -52,3 +52,55 @@ The code layout separates core infrastructure modules from manifest targets:
 
 ---
 
+## How to Deploy
+
+### Prerequisites
+*Valid AWS CLI credentials configured within your active workspace terminal.
+*Terraform CLI executable binary installed locally (>= 1.5.0).
+*kubectl and Helm command-line utilities configured locally.
+
+### Deployment Steps
+**Change directory into the IaC configuration folder:**
+```powershell
+cd terraform
+```
+**Initialize the working environment and download provider dependencies:**
+```powershell
+.\terraform.exe init
+```
+**Execute standard syntax checks to verify layout validity:**
+```powershell
+.\terraform.exe validate
+```
+**Preview the planned structural modifications to the account infrastructure:**
+```powershell
+.\terraform.exe plan
+```
+**Deploy the EKS cluster and networking components to AWS:**
+```powershell
+.\terraform.exe apply -auto-approve
+```
+**Configure your local kubectl context to connect to the cluster:**
+```powershell
+aws eks update-kubeconfig --region <aws-region> --name <cluster-name>
+```
+**Bootstrap ArgoCD for GitOps deployment:**
+```powershell
+kubectl create namespace argocd
+kubectl apply -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml](https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml)
+```
+## Clean Up
+
+To tear down all active cluster architectures, node groups, and associated cloud resources to prevent recurring maintenance fees, run the destruction routine:
+
+```powershell
+cd terraform
+.\terraform.exe destroy -auto-approve
+```
+
+---
+
+## Architectural Design Decisions
+
+* **Declarative GitOps Paradigm:** By utilizing ArgoCD as a continuous delivery controller, cluster configuration drift is eliminated. The Git repository serves as the single source of truth for all application workloads.
+* **FinOps Resource Overhead Management:** Compute node groups are configured with auto-scaling policies to scale down during low-traffic windows, and control plane management utilizes on-demand serverless or managed structures to balance performance with cost efficiency.
