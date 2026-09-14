@@ -20,9 +20,8 @@ The system organizes orchestration and delivery components into two integrated l
 ```mermaid
 flowchart TD
     Services[AWS Cloud Services] --> VPC[Amazon VPC & Subnets]
-    VPC --> EKS[Amazon EKS Cluster & Managed Node Groups]
-    EKS --> ArgoCD[ArgoCD GitOps Continuous Delivery]
-
+    VPC --> EKS[Amazon EKS & Node Groups]
+    EKS --> ArgoCD[ArgoCD GitOps Delivery]
 ```
 
 **Infrastructure Provisioning (Terraform):** Deploys a customized Virtual Private Cloud (VPC) featuring public and private subnets across multiple availability zones, managed NAT gateways, and an Amazon EKS cluster with managed compute node groups.
