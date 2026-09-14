@@ -1,3 +1,4 @@
+Markdown
 # AWS EKS Enterprise Platform with GitOps (ArgoCD & Terraform)
 
 A production-grade, highly available Amazon EKS cluster provisioned entirely via Terraform, featuring automated continuous deployment using ArgoCD for declarative GitOps workflows.
@@ -14,16 +15,13 @@ Infrastructure fully provisioned as code (IaC) with modular Terraform components
 ## Architecture Overview
 
 ```mermaid
-flowchart TD
-    subgraph AWS_Cloud ["AWS Cloud (VPC Multi-AZ)"]
-        ALB["Application Load Balancer"] --> EKS["Amazon EKS Control Plane"]
-        EKS --> Nodes["Managed Node Groups - EC2"]
-        Nodes --> Argo["ArgoCD Controller"]
-        Argo --> App["App [GitOps Applications]"]
-    end
-    Git["GitHub Repository"] -->|Syncs Manifests| Argo
-    
-    VPC & Networking: Custom multi-AZ Virtual Private Cloud with public and private subnets, ensuring secure network isolation.
+graph LR
+    Git[GitHub Repository] -->|Syncs Manifests| Argo[ArgoCD Controller]
+    Argo --> App[GitOps Application]
+    App --> ALB[Application Load Balancer]
+    ALB --> EKS[EKS Control Plane]
+    EKS --> Nodes[Multi-AZ Worker Nodes]
+VPC & Networking: Custom multi-AZ Virtual Private Cloud with public and private subnets, ensuring secure network isolation.
 
 Compute (EKS): Scalable Amazon EKS cluster managed via Terraform with robust worker node groups.
 
@@ -59,7 +57,7 @@ Install ArgoCD using server-side apply and register the application manifest:
 
 Bash
 kubectl create namespace argocd
-kubectl apply --server-side -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl apply --server-side -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml](https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml)
 kubectl apply -f ../k8s/argocd/application.yaml
 🧹 Cost Management (Cleanup)
 To avoid ongoing AWS charges, destroy the infrastructure when finished:
