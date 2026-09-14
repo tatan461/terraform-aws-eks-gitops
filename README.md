@@ -12,23 +12,10 @@ Infrastructure fully provisioned as code (IaC) with modular Terraform components
 - **GitOps Continuous Delivery:** ArgoCD continuously monitors this repository and automatically synchronizes the cluster state with the desired application manifests.
 - **VPC & Networking:** Custom multi-AZ Virtual Private Cloud with public and private subnets, ensuring secure network isolation and high availability.
 - **Compute (EKS):** Scalable Amazon EKS cluster managed via Terraform with robust worker node groups distributed across availability zones.
-- **Diagram:**
-  ```mermaid
-  graph LR
-    Git[GitHub Repository] -->|Syncs Manifests| Argo[ArgoCD Controller]
-    Argo --> App[GitOps Application]
-    App --> ALB[Application Load Balancer]
-    ALB --> EKS[EKS Control Plane]
-    EKS --> Nodes[Multi-AZ Worker Nodes]
-Prerequisites
-AWS CLI configured with active credentials.
-Terraform >= 1.5.0 installed.
-kubectl configured for your AWS account.
-AWS EKS CLI installed for update-kubeconfig.
-Project Structure
-text
 
-Copiar
+## Project Structure
+
+```text
 terraform-aws-eks-gitops/
 ├── terraform/
 │   ├── main.tf       # Provider configurations and required versions
