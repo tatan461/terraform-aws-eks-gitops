@@ -1,77 +1,54 @@
-markdown
+# AWS Enterprise EKS & GitOps Infrastructure
 
-Copiar
-# AWS EKS Enterprise Platform with GitOps (ArgoCD & Terraform)
+A modular Terraform configuration that provisions an Amazon EKS cluster and sets up continuous delivery with ArgoCD following the Reliability and Scalability Pillars of the AWS Well-Architected Framework.
 
-A production-grade, highly available Amazon EKS cluster provisioned entirely via Terraform, featuring automated continuous deployment using ArgoCD for declarative GitOps workflows.
+The primary objective of this deployment is to establish an elastic container platform managed via Infrastructure as Code (IaC), leveraging GitOps methodologies for zero-touch workload synchronization and automated continuous deployment.
 
-Infrastructure fully provisioned as code (IaC) with modular Terraform components.
+Infrastructure fully provisioned as code (IaC) with Terraform.
 
-## Architecture Overview
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=for-the-badge&logo=argo&logoColor=white)
 
-- **GitOps Continuous Delivery:** ArgoCD continuously monitors this repository and automatically synchronizes the cluster state with the desired application manifests.
-- **VPC & Networking:** Custom multi-AZ Virtual Private Cloud with public and private subnets, ensuring secure network isolation and high availability.
-- **Compute (EKS):** Scalable Amazon EKS cluster managed via Terraform with robust worker node groups distributed across availability zones.
+---
 
-## Project Structure
+## Infrastructure Architecture Layers
+
+The system organizes orchestration and delivery components into two integrated logical blocks:
+
+```mermaid
+flowchart TD
+    Services[AWS Cloud Services] --> VPC[Amazon VPC & Subnets]
+    VPC --> EKS[Amazon EKS Cluster & Managed Node Groups]
+    EKS --> ArgoCD[ArgoCD GitOps Continuous Delivery]
+
+```
+
+**Infrastructure Provisioning (Terraform):** Deploys a customized Virtual Private Cloud (VPC) featuring public and private subnets across multiple availability zones, managed NAT gateways, and an Amazon EKS cluster with managed compute node groups.
+
+**GitOps Continuous Delivery (ArgoCD):** Bootstrapped directly into the cluster control plane to continuously monitor and reconcile target manifests from a Git repository, ensuring absolute state synchronization.
+
+---
+
+## Repository Structure
+
+The code layout separates core infrastructure modules from manifest targets:
 
 ```text
-terraform-aws-eks-gitops/
-├── terraform/
-│   ├── main.tf       # Provider configurations and required versions
-│   ├── variables.tf  # Input variables (cluster name, version, region)
-│   ├── vpc.tf        # Network architecture module
-│   ├── eks.tf        # EKS cluster and managed node group definitions
-│   └── outputs.tf    # Post-deployment outputs (endpoint, kubeconfig command)
-└── k8s/
-    └── argocd/
-        └── application.yaml # Declarative ArgoCD application manifest
-Quick Start Guide
-1. Provision Infrastructure
-Navigate into the terraform directory and apply the configuration:
+├── terraform/                # Infrastructure as Code orchestration folder
+│   ├── modules/
+│   │   ├── vpc/              # Multi-AZ custom networking and gateways
+│   │   └── eks/              # Amazon EKS cluster and managed node groups
+│   ├── main.tf               # Root file mapping cluster and networking data flows
+│   ├── providers.tf          # AWS provider limits and backend constraints
+│   ├── variables.tf          # Environmental baseline input parameters
+│   └── outputs.tf            # Active cluster endpoint and connection strings
+├── kubernetes/               # GitOps manifests and synchronization targets
+│   ├── argocd/               # ArgoCD core installation manifests
+│   └── apps/                 # Application deployments managed declaratively
+└── README.md                 # System engineering documentation
+```
 
-bash
+---
 
-Copiar
-cd terraform
-terraform init
-terraform apply -auto-approve
-2. Configure Kubectl
-Update your local kubeconfig to target the new cluster (replace <your-region> and <cluster-name>):
-
-bash
-
-Copiar
-aws eks update-kubeconfig --region <your-region> --name <cluster-name>
-3. Install ArgoCD & Deploy via GitOps
-Install ArgoCD using server-side apply and register the application manifest contained in this repo:
-
-bash
-
-Copiar
-kubectl create namespace argocd
-kubectl apply --server-side -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-kubectl apply -f ../k8s/argocd/application.yaml
-Accessing ArgoCD
-Once deployed, you can access the ArgoCD UI. Retrieve the initial admin password:
-
-bash
-
-Copiar
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-Teardown (Cleanup)
-To delete all created AWS resources and avoid unexpected charges:
-
-Remove the GitOps application from the cluster:
-
-bash
-
-Copiar
-kubectl delete -f k8s/argocd/application.yaml
-Destroy the Terraform infrastructure:
-
-bash
-
-Copiar
-cd terraform
-terraform destroy -auto-approve
