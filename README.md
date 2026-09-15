@@ -20,7 +20,7 @@ The system organizes orchestration and delivery components into two integrated l
 ```mermaid
 graph LR
     subgraph AWS Core Infrastructure
-        A[Amazon VPC & Subnets] --> B[Amazon EKS & Managed Node Groups]
+        A[Amazon VPC & Subnets] --> B["Amazon EKS &<br/>Managed Node Groups"]
     end
 
     subgraph GitOps Delivery Layer
