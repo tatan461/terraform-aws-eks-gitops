@@ -18,10 +18,15 @@ Infrastructure fully provisioned as code (IaC) with Terraform.
 The system organizes orchestration and delivery components into two integrated logical blocks:
 
 ```mermaid
-flowchart TD
-    Services[AWS Cloud Services] --> VPC[Amazon VPC & Subnets]
-    VPC --> EKS[Amazon EKS & Node Groups]
-    EKS --> ArgoCD[ArgoCD GitOps Delivery]
+graph LR
+    subgraph AWS Core Infrastructure
+        A[Amazon VPC & Subnets] --> B[Amazon EKS & Managed Node Groups]
+    end
+
+    subgraph GitOps Delivery Layer
+        B --> C[ArgoCD Controller]
+        C --> D[Target Kubernetes Workloads]
+    end
 ```
 
 **Infrastructure Provisioning (Terraform):** Deploys a customized Virtual Private Cloud (VPC) featuring public and private subnets across multiple availability zones, managed NAT gateways, and an Amazon EKS cluster with managed compute node groups.
@@ -60,31 +65,31 @@ The code layout separates core infrastructure modules from manifest targets:
 
 ### Deployment Steps
 **Change directory into the IaC configuration folder:**
-```powershell
+```bash
 cd terraform
 ```
 **Initialize the working environment and download provider dependencies:**
-```powershell
+```bash
 .\terraform.exe init
 ```
 **Execute standard syntax checks to verify layout validity:**
-```powershell
+```bash
 .\terraform.exe validate
 ```
 **Preview the planned structural modifications to the account infrastructure:**
-```powershell
+```bash
 .\terraform.exe plan
 ```
 **Deploy the EKS cluster and networking components to AWS:**
-```powershell
+```bash
 .\terraform.exe apply -auto-approve
 ```
 **Configure your local kubectl context to connect to the cluster:**
-```powershell
+```bash
 aws eks update-kubeconfig --region <aws-region> --name <cluster-name>
 ```
 **Bootstrap ArgoCD for GitOps deployment:**
-```powershell
+```bash
 kubectl create namespace argocd
 kubectl apply -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml](https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml)
 ```
@@ -92,7 +97,7 @@ kubectl apply -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/s
 
 To tear down all active cluster architectures, node groups, and associated cloud resources to prevent recurring maintenance fees, run the destruction routine:
 
-```powershell
+```bash
 cd terraform
 .\terraform.exe destroy -auto-approve
 ```
